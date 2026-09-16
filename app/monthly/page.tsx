@@ -33,6 +33,27 @@ export default function MonthlyPage() {
   }).format(now)
 
   // =========================
+  // ฟังก์ชันเรียง Code แบบตัวเลข ASC
+  // =========================
+
+  function sortByCode(data: ImportRow[]) {
+    return [...data].sort((a, b) => {
+      const codeA = Number(a.code)
+      const codeB = Number(b.code)
+
+      // ถ้าทั้งคู่เป็นตัวเลข
+      if (Number.isFinite(codeA) && Number.isFinite(codeB)) {
+        return codeA - codeB
+      }
+
+      // เผื่ออนาคตมี Code ที่ไม่ใช่ตัวเลข
+      return a.code.localeCompare(b.code, 'th', {
+        numeric: true,
+      })
+    })
+  }
+
+  // =========================
   // ยอดรวม Preview
   // =========================
 
@@ -63,7 +84,6 @@ export default function MonthlyPage() {
       .from('monthly_records')
       .select('code,name,amount')
       .eq('record_month', recordMonth)
-      .order('code', { ascending: true })
 
     if (error) {
       console.error('LOAD ERROR:', error)
@@ -82,7 +102,9 @@ export default function MonthlyPage() {
       amount: Number(item.amount ?? 0),
     }))
 
-    setSavedRows(result)
+    // เรียง Code แบบตัวเลข ASC
+    setSavedRows(sortByCode(result))
+
     setLoading(false)
   }
 
@@ -158,15 +180,18 @@ export default function MonthlyPage() {
       })
     }
 
-    setRows(parsedRows)
+    // เรียง Code ASC ก่อนแสดง Preview
+    const sortedRows = sortByCode(parsedRows)
 
-    if (parsedRows.length === 0) {
+    setRows(sortedRows)
+
+    if (sortedRows.length === 0) {
       setMessage('ไม่พบข้อมูลที่สามารถนำเข้าได้')
       return
     }
 
     setMessage(
-      `อ่านข้อมูลสำเร็จ ${parsedRows.length} รายการ`
+      `อ่านข้อมูลสำเร็จ ${sortedRows.length} รายการ`
     )
   }
 
@@ -237,7 +262,9 @@ export default function MonthlyPage() {
     // 2. เตรียมข้อมูลชุดใหม่
     // =========================
 
-    const payload = rows.map((row) => ({
+    const sortedRows = sortByCode(rows)
+
+    const payload = sortedRows.map((row) => ({
       code: row.code,
       name: row.name,
       amount: row.amount,

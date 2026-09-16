@@ -3,230 +3,296 @@
 import { FormEvent, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
-type Detail = {
-  id: number
+type LoanRecord = {
   code: string
   name: string
-  monthly: number
+  amount: number
+  record_month: string
 }
 
-const months = [
-  'มกราคม',
-  'กุมภาพันธ์',
-  'มีนาคม',
-  'เมษายน',
-  'พฤษภาคม',
-  'มิถุนายน',
-  'กรกฎาคม',
-  'สิงหาคม',
-  'กันยายน',
-  'ตุลาคม',
-  'พฤศจิกายน',
-  'ธันวาคม',
-]
-
 export default function CheckPage() {
+  const [search, setSearch] = useState('')
+  const [results, setResults] = useState<LoanRecord[]>([])
+  const [searched, setSearched] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  // เดือนปัจจุบัน เช่น 2026-09-01
   const now = new Date()
 
-  const currentMonth = now.getMonth() + 1
-  const currentYear = now.getFullYear()
-  const thaiYear = currentYear + 543
+  const recordMonth =
+    `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
 
-  const [keyword, setKeyword] = useState('')
-  const [results, setResults] = useState<Detail[]>([])
-  const [message, setMessage] = useState('')
-  const [loading, setLoading] = useState(false)
+  const monthText = new Intl.DateTimeFormat('th-TH', {
+    month: 'long',
+    year: 'numeric',
+  }).format(now)
 
-  function getCurrentPeriod() {
-    return `${currentYear}-${String(currentMonth).padStart(2, '0')}-01`
-  }
-
-  async function search(e: FormEvent) {
+  async function handleSearch(e: FormEvent) {
     e.preventDefault()
 
-    const searchText = keyword.trim()
+    const keyword = search.trim()
 
-    setResults([])
-    setMessage('')
-
-    if (!searchText) {
-      setMessage('กรุณากรอกรหัสหรือชื่อ')
+    if (!keyword) {
+      setResults([])
+      setSearched(false)
+      setErrorMessage('กรุณากรอกรหัสหรือชื่อ')
       return
     }
 
     setLoading(true)
+    setSearched(false)
+    setErrorMessage('')
+    setResults([])
 
-    // ค้นหาด้วย Code หรือ Name
-    const { data: members, error: memberError } = await supabase
-      .from('members')
-      .select('id, code, name')
-      .or(`code.ilike.%${searchText}%,name.ilike.%${searchText}%`)
-      .order('code', { ascending: true })
-      .limit(20)
-
-    if (memberError) {
-      setLoading(false)
-      setMessage(memberError.message)
-      return
-    }
-
-    if (!members || members.length === 0) {
-      setLoading(false)
-      setMessage(`ไม่พบข้อมูล "${searchText}"`)
-      return
-    }
-
-    const memberIds = members.map((member) => member.id)
-
-    // ดึงเฉพาะยอดของเดือนปัจจุบัน
-    const { data: records, error: recordError } = await supabase
+    // ค้นเฉพาะข้อมูลของเดือนปัจจุบัน
+    // ค้นได้ทั้ง code และ name
+    const { data, error } = await supabase
       .from('monthly_records')
-      .select('member_id, monthly')
-      .in('member_id', memberIds)
-      .eq('period', getCurrentPeriod())
+      .select('code,name,amount,record_month')
+      .eq('record_month', recordMonth)
+      .or(`code.eq.${keyword},name.ilike.%${keyword}%`)
+      .order('code', { ascending: true })
 
     setLoading(false)
+    setSearched(true)
 
-    if (recordError) {
-      setMessage(recordError.message)
+    if (error) {
+      console.error('SEARCH ERROR:', error)
+
+      setErrorMessage(
+        `ค้นหาไม่สำเร็จ: ${error.message}`
+      )
+
       return
     }
 
-    const amountMap = new Map(
-      (records ?? []).map((record) => [
-        record.member_id,
-        Number(record.monthly),
-      ])
-    )
-
-    const result: Detail[] = members.map((member) => ({
-      id: member.id,
-      code: member.code,
-      name: member.name,
-      monthly: amountMap.get(member.id) ?? 0,
+    const mapped: LoanRecord[] = (data ?? []).map((item) => ({
+      code: String(item.code ?? ''),
+      name: String(item.name ?? ''),
+      amount: Number(item.amount ?? 0),
+      record_month: String(item.record_month ?? ''),
     }))
 
-    setResults(result)
+    setResults(mapped)
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 p-4 md:p-8">
-      <div className="mx-auto max-w-4xl">
+    <main
+      style={{
+        maxWidth: 900,
+        margin: '40px auto',
+        padding: 20,
+        fontFamily: 'Arial, sans-serif',
+      }}
+    >
+      {/* HEADER */}
 
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold">
-            ตรวจสอบยอด
-          </h1>
+      <h1 style={{ marginBottom: 5 }}>
+        ตรวจสอบยอด
+      </h1>
 
-          <p className="mt-1 text-gray-500">
-            ประจำเดือน {months[currentMonth - 1]} {thaiYear}
-          </p>
+      <div
+        style={{
+          color: '#666',
+          marginBottom: 25,
+        }}
+      >
+        ประจำเดือน {monthText}
+      </div>
+
+      {/* SEARCH */}
+
+      <form
+        onSubmit={handleSearch}
+        style={{
+          background: '#fff',
+          border: '1px solid #ddd',
+          borderRadius: 12,
+          padding: 20,
+          marginBottom: 25,
+        }}
+      >
+        <label
+          style={{
+            display: 'block',
+            marginBottom: 8,
+          }}
+        >
+          ค้นหาด้วยรหัส หรือชื่อ
+        </label>
+
+        <div
+          style={{
+            display: 'flex',
+            gap: 10,
+          }}
+        >
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="เช่น 100 หรือ นายสมชาย"
+            autoComplete="off"
+            style={{
+              flex: 1,
+              padding: '12px 14px',
+              fontSize: 16,
+              border: '1px solid #ccc',
+              borderRadius: 8,
+            }}
+          />
+
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              padding: '12px 25px',
+              background: '#000',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 8,
+              fontSize: 16,
+              cursor: loading
+                ? 'not-allowed'
+                : 'pointer',
+            }}
+          >
+            {loading ? 'กำลังค้นหา...' : 'ค้นหา'}
+          </button>
         </div>
 
-        {/* Search */}
+        {errorMessage && (
+          <div
+            style={{
+              marginTop: 15,
+              color: '#c00',
+            }}
+          >
+            {errorMessage}
+          </div>
+        )}
+      </form>
 
-        <form
-          onSubmit={search}
-          className="mb-6 rounded-xl bg-white p-5 shadow-sm"
-        >
-          <label className="mb-1 block text-sm text-gray-600">
-            ค้นหา
-          </label>
+      {/* NOT FOUND */}
 
-          <div className="flex gap-2">
-
-            <input
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              placeholder="กรอกรหัส หรือ ชื่อ"
-              className="min-w-0 flex-1 rounded-lg border border-gray-300 px-3 py-2"
-            />
-
-            <button
-              disabled={loading}
-              className="rounded-lg bg-black px-6 py-2 text-white disabled:opacity-50"
+      {searched &&
+        !loading &&
+        results.length === 0 &&
+        !errorMessage && (
+          <section
+            style={{
+              background: '#fff',
+              border: '1px solid #ddd',
+              borderRadius: 12,
+              padding: 25,
+              textAlign: 'center',
+            }}
+          >
+            ไม่พบข้อมูล &quot;{search}&quot;
+            <div
+              style={{
+                marginTop: 5,
+                color: '#777',
+              }}
             >
-              {loading ? 'กำลังค้นหา...' : 'ค้นหา'}
-            </button>
-
-          </div>
-        </form>
-
-        {/* Message */}
-
-        {message && (
-          <div className="rounded-xl bg-white p-5 text-center shadow-sm">
-            {message}
-          </div>
+              ประจำเดือน {monthText}
+            </div>
+          </section>
         )}
 
-        {/* Results */}
+      {/* RESULT */}
 
-        {results.length > 0 && (
-          <div className="space-y-4">
-
-            {results.map((item) => (
+      {results.length > 0 && (
+        <div
+          style={{
+            display: 'grid',
+            gap: 15,
+          }}
+        >
+          {results.map((item, index) => (
+            <section
+              key={`${item.code}-${index}`}
+              style={{
+                background: '#fff',
+                border: '1px solid #ddd',
+                borderRadius: 12,
+                padding: 25,
+              }}
+            >
               <div
-                key={item.id}
-                className="overflow-hidden rounded-xl bg-white shadow-sm"
+                style={{
+                  display: 'grid',
+                  gap: 15,
+                }}
               >
-
-                <div className="border-b px-6 py-3 text-sm text-gray-500">
-                  {months[currentMonth - 1]} {thaiYear}
-                </div>
-
-                <div className="p-6">
-
-                  <div className="grid grid-cols-[80px_1fr] gap-y-3">
-
-                    <div className="text-gray-500">
-                      รหัส
-                    </div>
-
-                    <div className="font-semibold">
-                      {item.code}
-                    </div>
-
-                    <div className="text-gray-500">
-                      ชื่อ
-                    </div>
-
-                    <div className="font-semibold">
-                      {item.name}
-                    </div>
-
+                <div>
+                  <div
+                    style={{
+                      color: '#777',
+                      fontSize: 14,
+                    }}
+                  >
+                    รหัส
                   </div>
 
-                  <div className="mt-5 border-t pt-5">
-
-                    <div className="text-sm text-gray-500">
-                      ยอด
-                    </div>
-
-                    <div className="mt-1 text-3xl font-bold">
-
-                      {item.monthly.toLocaleString('th-TH', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-
-                      <span className="ml-2 text-lg font-normal text-gray-500">
-                        บาท
-                      </span>
-
-                    </div>
-
+                  <div
+                    style={{
+                      fontSize: 20,
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    {item.code}
                   </div>
-
                 </div>
 
+                <div>
+                  <div
+                    style={{
+                      color: '#777',
+                      fontSize: 14,
+                    }}
+                  >
+                    ชื่อ
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize: 20,
+                    }}
+                  >
+                    {item.name}
+                  </div>
+                </div>
+
+                <div>
+                  <div
+                    style={{
+                      color: '#777',
+                      fontSize: 14,
+                    }}
+                  >
+                    ยอดสินเชื่อ
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize: 28,
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    {item.amount.toLocaleString('th-TH', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}{' '}
+                    บาท
+                  </div>
+                </div>
               </div>
-            ))}
-
-          </div>
-        )}
-
-      </div>
+            </section>
+          ))}
+        </div>
+      )}
     </main>
   )
 }

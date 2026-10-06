@@ -84,17 +84,19 @@ export default function CheckPage() {
         margin: '40px auto',
         padding: 20,
         fontFamily: 'Arial, sans-serif',
+        background: 'var(--background)',
+        color: 'var(--foreground)',
       }}
     >
       {/* HEADER */}
 
-      <h1 style={{ marginBottom: 5 }}>
+      <h1 style={{ marginBottom: 5, color: 'var(--foreground)', fontSize: 32 }}>
         ตรวจสอบยอด
       </h1>
 
       <div
         style={{
-          color: '#666',
+          color: 'var(--muted)',
           marginBottom: 25,
         }}
       >
@@ -106,17 +108,19 @@ export default function CheckPage() {
       <form
         onSubmit={handleSearch}
         style={{
-          background: '#fff',
-          border: '1px solid #ddd',
+          background: 'var(--panel)',
+          border: '1px solid var(--border)',
           borderRadius: 12,
           padding: 20,
           marginBottom: 25,
+          boxShadow: '0 10px 25px var(--shadow)',
         }}
       >
         <label
           style={{
             display: 'block',
             marginBottom: 8,
+            color: 'var(--foreground)',
           }}
         >
           ค้นหาด้วยรหัส หรือชื่อ
@@ -138,8 +142,10 @@ export default function CheckPage() {
               flex: 1,
               padding: '12px 14px',
               fontSize: 16,
-              border: '1px solid #ccc',
+              border: '1px solid var(--input-border)',
               borderRadius: 8,
+              background: 'var(--input-bg)',
+              color: 'var(--foreground)',
             }}
           />
 
@@ -148,14 +154,15 @@ export default function CheckPage() {
             disabled={loading}
             style={{
               padding: '12px 25px',
-              background: '#000',
-              color: '#fff',
-              border: 'none',
+              background: 'var(--button)',
+              color: 'var(--button-text)',
+              border: '1px solid var(--border)',
               borderRadius: 8,
               fontSize: 16,
               cursor: loading
                 ? 'not-allowed'
                 : 'pointer',
+              fontWeight: 700,
             }}
           >
             {loading ? 'กำลังค้นหา...' : 'ค้นหา'}
@@ -166,7 +173,7 @@ export default function CheckPage() {
           <div
             style={{
               marginTop: 15,
-              color: '#c00',
+              color: '#fca5a5',
             }}
           >
             {errorMessage}
@@ -182,18 +189,19 @@ export default function CheckPage() {
         !errorMessage && (
           <section
             style={{
-              background: '#fff',
-              border: '1px solid #ddd',
+              background: 'var(--panel)',
+              border: '1px solid var(--border)',
               borderRadius: 12,
               padding: 25,
               textAlign: 'center',
+              boxShadow: '0 10px 25px var(--shadow)',
             }}
           >
             ไม่พบข้อมูล &quot;{search}&quot;
             <div
               style={{
                 marginTop: 5,
-                color: '#777',
+                color: 'var(--muted)',
               }}
             >
               ประจำเดือน {monthText}
@@ -214,10 +222,11 @@ export default function CheckPage() {
             <section
               key={`${item.code}-${index}`}
               style={{
-                background: '#fff',
-                border: '1px solid #ddd',
+                background: 'var(--panel)',
+                border: '1px solid var(--border)',
                 borderRadius: 12,
                 padding: 25,
+                boxShadow: '0 10px 25px var(--shadow)',
               }}
             >
               <div
@@ -229,7 +238,7 @@ export default function CheckPage() {
                 <div>
                   <div
                     style={{
-                      color: '#777',
+                      color: 'var(--muted)',
                       fontSize: 14,
                     }}
                   >
@@ -249,7 +258,7 @@ export default function CheckPage() {
                 <div>
                   <div
                     style={{
-                      color: '#777',
+                      color: 'var(--muted)',
                       fontSize: 14,
                     }}
                   >
@@ -268,7 +277,7 @@ export default function CheckPage() {
                 <div>
                   <div
                     style={{
-                      color: '#777',
+                      color: 'var(--muted)',
                       fontSize: 14,
                     }}
                   >

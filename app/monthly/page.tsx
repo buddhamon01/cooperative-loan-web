@@ -336,16 +336,18 @@ export default function MonthlyPage() {
         margin: '40px auto',
         padding: 20,
         fontFamily: 'Arial, sans-serif',
+        background: 'var(--background)',
+        color: 'var(--foreground)',
       }}
     >
-      <h1 style={{ marginBottom: 5 }}>
+      <h1 style={{ marginBottom: 5, color: 'var(--foreground)', fontSize: 32 }}>
         บันทึกยอดสินเชื่อ
       </h1>
 
       <div
         style={{
           fontSize: 18,
-          color: '#555',
+          color: 'var(--muted)',
           marginBottom: 25,
         }}
       >
@@ -358,17 +360,19 @@ export default function MonthlyPage() {
 
       <section
         style={{
-          border: '1px solid #ddd',
+          border: '1px solid var(--border)',
           borderRadius: 12,
           padding: 20,
           marginBottom: 25,
+          background: 'var(--panel)',
+          boxShadow: '0 10px 25px var(--shadow)',
         }}
       >
-        <h2 style={{ marginTop: 0 }}>
+        <h2 style={{ marginTop: 0, color: 'var(--foreground)' }}>
           นำเข้าจาก Google Sheet
         </h2>
 
-        <p style={{ color: '#666' }}>
+        <p style={{ color: 'var(--muted)' }}>
           Copy 3 คอลัมน์ รหัส + ชื่อ + ยอดสินเชื่อ
           แล้ววางในช่องด้านล่าง
         </p>
@@ -386,10 +390,12 @@ export default function MonthlyPage() {
             minHeight: 180,
             padding: 15,
             boxSizing: 'border-box',
-            border: '1px solid #bbb',
+            border: '1px solid var(--input-border)',
             borderRadius: 8,
             fontSize: 16,
             resize: 'vertical',
+            background: 'var(--input-bg)',
+            color: 'var(--foreground)',
           }}
         />
 
@@ -407,6 +413,11 @@ export default function MonthlyPage() {
               padding: '10px 20px',
               cursor: 'pointer',
               fontSize: 16,
+              borderRadius: 8,
+              border: '1px solid var(--border)',
+              background: 'var(--button)',
+              color: 'var(--button-text)',
+              fontWeight: 700,
             }}
           >
             อ่านข้อมูล
@@ -418,6 +429,10 @@ export default function MonthlyPage() {
               padding: '10px 20px',
               cursor: 'pointer',
               fontSize: 16,
+              borderRadius: 8,
+              border: '1px solid var(--border)',
+              background: 'transparent',
+              color: 'var(--foreground)',
             }}
           >
             ล้างข้อมูล
@@ -429,8 +444,10 @@ export default function MonthlyPage() {
             style={{
               marginTop: 15,
               padding: 12,
-              background: '#f5f5f5',
+              background: 'rgba(59,130,246,0.12)',
+              border: '1px solid rgba(96,165,250,0.3)',
               borderRadius: 8,
+              color: 'var(--foreground)',
             }}
           >
             {message}
@@ -445,23 +462,26 @@ export default function MonthlyPage() {
       {rows.length > 0 && (
         <section
           style={{
-            border: '1px solid #ddd',
+            border: '1px solid var(--border)',
             borderRadius: 12,
             overflow: 'hidden',
             marginBottom: 30,
+            background: 'var(--panel)',
+            boxShadow: '0 10px 25px var(--shadow)',
           }}
         >
           <div
             style={{
               padding: 20,
-              borderBottom: '1px solid #ddd',
+              borderBottom: '1px solid var(--border)',
+              background: 'var(--panel-strong)',
             }}
           >
-            <strong>
+            <strong style={{ color: 'var(--foreground)' }}>
               ตรวจสอบข้อมูลก่อนบันทึก
             </strong>
 
-            <div style={{ marginTop: 5 }}>
+            <div style={{ marginTop: 5, color: 'var(--muted)' }}>
               พบทั้งหมด {rows.length} รายการ
             </div>
 
@@ -470,8 +490,10 @@ export default function MonthlyPage() {
                 style={{
                   marginTop: 10,
                   padding: 10,
-                  background: '#fff4d6',
+                  background: 'rgba(245, 158, 11, 0.12)',
+                  border: '1px solid rgba(245, 158, 11, 0.35)',
                   borderRadius: 6,
+                  color: '#fbbf24',
                 }}
               >
                 เดือนนี้มีข้อมูลเดิม {savedRows.length} รายการ
@@ -502,6 +524,10 @@ export default function MonthlyPage() {
                   ? 'not-allowed'
                   : 'pointer',
                 fontWeight: 'bold',
+                borderRadius: 8,
+                border: '1px solid var(--border)',
+                background: 'var(--button)',
+                color: 'var(--button-text)',
               }}
             >
               {saving
@@ -520,32 +546,35 @@ export default function MonthlyPage() {
 
       <section
         style={{
-          border: '1px solid #ddd',
+          border: '1px solid var(--border)',
           borderRadius: 12,
           overflow: 'hidden',
+          background: 'var(--panel)',
+          boxShadow: '0 10px 25px var(--shadow)',
         }}
       >
         <div
           style={{
             padding: 20,
-            borderBottom: '1px solid #ddd',
+            borderBottom: '1px solid var(--border)',
+            background: 'var(--panel-strong)',
           }}
         >
-          <h2 style={{ margin: 0 }}>
+          <h2 style={{ margin: 0, color: 'var(--foreground)' }}>
             ข้อมูลที่บันทึกแล้ว
           </h2>
 
           <div
             style={{
               marginTop: 6,
-              color: '#666',
+              color: 'var(--muted)',
             }}
           >
             ประจำเดือน {monthText}
           </div>
 
           {!loading && (
-            <div style={{ marginTop: 6 }}>
+            <div style={{ marginTop: 6, color: 'var(--muted)' }}>
               ทั้งหมด {savedRows.length} รายการ
             </div>
           )}
@@ -556,6 +585,7 @@ export default function MonthlyPage() {
             style={{
               padding: 30,
               textAlign: 'center',
+              color: 'var(--muted)',
             }}
           >
             กำลังโหลดข้อมูล...
@@ -567,7 +597,7 @@ export default function MonthlyPage() {
             style={{
               padding: 40,
               textAlign: 'center',
-              color: '#777',
+              color: 'var(--muted)',
             }}
           >
             เดือนนี้ยังไม่มีข้อมูล
@@ -602,10 +632,11 @@ function DataTable({
         style={{
           width: '100%',
           borderCollapse: 'collapse',
+          color: 'var(--foreground)',
         }}
       >
         <thead>
-          <tr style={{ background: '#f5f5f5' }}>
+          <tr style={{ background: 'rgba(148,163,184,0.12)' }}>
             <th style={thStyle}>#</th>
             <th style={thStyle}>รหัส</th>
             <th style={thStyle}>ชื่อ</th>
@@ -654,7 +685,7 @@ function DataTable({
         <tfoot>
           <tr
             style={{
-              background: '#f5f5f5',
+              background: 'rgba(148,163,184,0.12)',
               fontWeight: 'bold',
             }}
           >
@@ -694,12 +725,14 @@ function DataTable({
 
 const thStyle: React.CSSProperties = {
   padding: 12,
-  borderBottom: '1px solid #ddd',
+  borderBottom: '1px solid var(--border)',
   textAlign: 'left',
   whiteSpace: 'nowrap',
+  color: 'var(--foreground)',
 }
 
 const tdStyle: React.CSSProperties = {
   padding: 12,
-  borderBottom: '1px solid #eee',
+  borderBottom: '1px solid var(--border)',
+  color: 'var(--foreground)',
 }

@@ -93,15 +93,15 @@ export default function MembersPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 p-4 md:p-8">
+    <main className="min-h-screen bg-[#070b10] p-4 text-slate-50 md:p-8">
       <div className="mx-auto max-w-5xl">
 
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-white">
             จัดการรายชื่อ
           </h1>
 
-          <p className="mt-1 text-gray-500">
+          <p className="mt-1 text-slate-300">
             เพิ่ม Code และ Name สำหรับใช้บันทึกยอดประจำเดือน
           </p>
         </div>
@@ -110,36 +110,36 @@ export default function MembersPage() {
 
         <form
           onSubmit={addMember}
-          className="mb-6 rounded-xl bg-white p-5 shadow-sm"
+          className="mb-6 rounded-xl border border-slate-700 bg-slate-900 p-5 shadow-lg shadow-slate-950/30"
         >
-          <h2 className="mb-4 font-semibold text-gray-900">
+          <h2 className="mb-4 font-semibold text-white">
             + เพิ่มรายชื่อ
           </h2>
 
           <div className="grid gap-4 md:grid-cols-[200px_1fr_auto]">
 
             <div>
-              <label className="mb-1 block text-sm text-gray-600">
+              <label className="mb-1 block text-sm text-slate-300">
                 Code
               </label>
 
               <input
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                className="w-full rounded-lg border border-slate-600 bg-slate-950 px-3 py-2 text-white placeholder:text-slate-400"
                 placeholder="เช่น 001"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-sm text-gray-600">
+              <label className="mb-1 block text-sm text-slate-300">
                 Name
               </label>
 
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                className="w-full rounded-lg border border-slate-600 bg-slate-950 px-3 py-2 text-white placeholder:text-slate-400"
                 placeholder="ชื่อ"
               />
             </div>
@@ -147,7 +147,7 @@ export default function MembersPage() {
             <div className="flex items-end">
               <button
                 disabled={saving}
-                className="w-full rounded-lg bg-black px-5 py-2 text-white disabled:opacity-50"
+                className="w-full rounded-lg bg-slate-100 px-5 py-2 font-medium text-slate-900 disabled:opacity-50"
               >
                 {saving ? 'กำลังเพิ่ม...' : '+ Add'}
               </button>
@@ -158,28 +158,28 @@ export default function MembersPage() {
 
         {/* Member list */}
 
-        <div className="overflow-hidden rounded-xl bg-white shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-slate-700 bg-slate-900 shadow-lg shadow-slate-950/30">
 
-          <div className="border-b p-4">
-            <span className="font-semibold">
+          <div className="border-b border-slate-700 bg-slate-900 p-4">
+            <span className="font-semibold text-white">
               รายชื่อทั้งหมด
             </span>
 
-            <span className="ml-2 text-sm text-gray-500">
+            <span className="ml-2 text-sm text-slate-300">
               {members.length} รายการ
             </span>
           </div>
 
           {loading ? (
-            <div className="p-8 text-center text-gray-500">
+            <div className="p-8 text-center text-slate-300">
               กำลังโหลด...
             </div>
           ) : (
 
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full text-slate-100">
 
-                <thead className="bg-gray-50">
+                <thead className="bg-slate-800">
                   <tr>
                     <th className="px-4 py-3 text-left">#</th>
                     <th className="px-4 py-3 text-left">Code</th>
@@ -194,7 +194,7 @@ export default function MembersPage() {
                   {members.map((member, index) => (
                     <tr
                       key={member.id}
-                      className="border-t"
+                      className="border-t border-slate-700"
                     >
                       <td className="px-4 py-3">
                         {index + 1}
